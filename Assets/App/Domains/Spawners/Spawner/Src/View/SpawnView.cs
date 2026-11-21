@@ -67,6 +67,10 @@ namespace App.Spawner
         
         public void Dispose()
         {
+            // Already destroyed by Unity when the scene unloads before the pool is disposed
+            if (this == null)
+                return;
+
             Destroy(gameObject);
         }
     }
