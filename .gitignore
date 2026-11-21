@@ -79,3 +79,6 @@ crashlytics-build.properties
 
 # macOS
 .DS_Store
+
+# Unity temp build tools cache
+/.utmp/
