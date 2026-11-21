@@ -23,8 +23,8 @@ namespace App.Spawner
             _rigidbody = GetComponent<Rigidbody>();
             
             _rigidbody.mass = 1f; // Adjust as necessary
-            _rigidbody.drag = 0.5f; // Adjust to simulate resistance
-            _rigidbody.angularDrag = 0.5f; // Prevent excessive spinning
+            _rigidbody.linearDamping = 0.5f; // Adjust to simulate resistance
+            _rigidbody.angularDamping = 0.5f; // Prevent excessive spinning
             _rigidbody.interpolation = RigidbodyInterpolation.Interpolate; // For smoother movement
             _rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic; // For fast-moving objects
 
