@@ -12,21 +12,40 @@ namespace App.Editor
     {
         private const string BuildsRoot = "Builds";
 
-        [MenuItem("Build/macOS")]
-        public static void BuildMacOS() =>
-            Build(BuildTarget.StandaloneOSX, Path.Combine(BuildsRoot, "macOS", "DinoRunner.app"));
+        internal static readonly string MacOSPath = Path.Combine(BuildsRoot, "macOS", "DinoRunner.app");
+        internal static readonly string WindowsPath = Path.Combine(BuildsRoot, "Windows", "DinoRunner.exe");
+        internal static readonly string WebGLPath = Path.Combine(BuildsRoot, "WebGL");
+        internal static readonly string AndroidPath = Path.Combine(BuildsRoot, "Android", "dino-runner.apk");
+        internal static readonly string IOSSimulatorPath = Path.Combine(BuildsRoot, "iOS");
 
-        [MenuItem("Build/Windows")]
-        public static void BuildWindows() =>
-            Build(BuildTarget.StandaloneWindows64, Path.Combine(BuildsRoot, "Windows", "DinoRunner.exe"));
+        [MenuItem("Build/macOS", priority = 1)]
+        public static void BuildMacOS() => Build(BuildTarget.StandaloneOSX, MacOSPath);
 
-        [MenuItem("Build/WebGL")]
-        public static void BuildWebGL() =>
-            Build(BuildTarget.WebGL, Path.Combine(BuildsRoot, "WebGL"));
+        [MenuItem("Build/Windows", priority = 2)]
+        public static void BuildWindows() => Build(BuildTarget.StandaloneWindows64, WindowsPath);
 
-        [MenuItem("Build/Android")]
-        public static void BuildAndroid() =>
-            Build(BuildTarget.Android, Path.Combine(BuildsRoot, "Android", "dino-runner.apk"));
+        [MenuItem("Build/WebGL", priority = 3)]
+        public static void BuildWebGL() => Build(BuildTarget.WebGL, WebGLPath);
+
+        [MenuItem("Build/Android", priority = 4)]
+        public static void BuildAndroid() => Build(BuildTarget.Android, AndroidPath);
+
+        // Xcode project built against the Simulator SDK, so "Build/Run (iOS)" can launch it in the iOS Simulator
+        [MenuItem("Build/iOS Simulator", priority = 5)]
+        public static void BuildIOSSimulator()
+        {
+            var sdkVersion = PlayerSettings.iOS.sdkVersion;
+            PlayerSettings.iOS.sdkVersion = iOSSdkVersion.SimulatorSDK;
+
+            try
+            {
+                Build(BuildTarget.iOS, IOSSimulatorPath);
+            }
+            finally
+            {
+                PlayerSettings.iOS.sdkVersion = sdkVersion;
+            }
+        }
 
         private static void Build(BuildTarget target, string locationPathName)
         {

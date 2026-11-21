@@ -32,7 +32,13 @@ unity build . --target StandaloneOSX --output-path Builds/macOS/DinoRunner.app \
   --provenance-path Builds/macOS/unity-build.provenance.json   # keep the manifest out of the .app (it breaks codesign)
 ```
 
-- Editor menu / CI builds: `Assets/Editor/BuildScript.cs` (**Build → macOS / Windows / WebGL / Android**, or `-executeMethod App.Editor.BuildScript.BuildMacOS`). Output goes to `Builds/` (git-ignored).
+- Editor menu / CI builds: `Assets/Editor/BuildScript.cs` (**Build → macOS / Windows / WebGL / Android / iOS Simulator**, or `-executeMethod App.Editor.BuildScript.BuildMacOS`). Output goes to `Builds/` (git-ignored).
+- **Build → Run (<Platform>)** (`BuildRunMenu.cs`) is enabled only when that build exists:
+  - macOS opens the app; Windows runs the `.exe` (Windows Editor only).
+  - WebGL serves `Builds/WebGL` from a local server (`WebGLServer.cs`) and opens the browser.
+  - Android installs and launches the APK on a device, booting the first AVD if none is connected (`AndroidLauncher.cs`).
+  - iOS builds with `xcodebuild` and launches in the Simulator (`IOSSimulatorLauncher.cs`, needs Xcode).
+- `unity build` can't build WebGL/Android/iOS while the Editor is open. Use the Build menu, or call `BuildScript` through `script eval`.
 - Tests are PlayMode NUnit tests in `Assets/Tests/` (`App.Character.Dino.Tests`, `App.Spawner.Tests`). Run them in the open Editor: through the Pipeline (see `unity-cli`) or Rider's test runner. `unity test` refuses a project that is open in an Editor, so don't close the user's Editor to make room.
 
 ## Layout
