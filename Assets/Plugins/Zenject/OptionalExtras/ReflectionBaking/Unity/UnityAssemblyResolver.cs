@@ -16,11 +16,9 @@ namespace Zenject.ReflectionBaking
             _appDomainAssemblyLocations = new Dictionary<string, string>();
             _cache = new Dictionary<string, AssemblyDefinition>();
 
-            AppDomain domain = AppDomain.CurrentDomain;
+            IReadOnlyList<Assembly> assemblies = UnityEngine.Assemblies.CurrentAssemblies.GetLoadedAssemblies();
 
-            Assembly[] assemblies = domain.GetAssemblies();
-
-            for (int i = 0; i < assemblies.Length; i++)
+            for (int i = 0; i < assemblies.Count; i++)
             {
 #if NET_4_6
                 if (assemblies[i].IsDynamic)
@@ -29,9 +27,17 @@ namespace Zenject.ReflectionBaking
                 }
 #endif
 
-                _appDomainAssemblyLocations[assemblies[i].FullName] = assemblies[i].Location;
+                // Assembly.Location is "" in Unity (assemblies are loaded from stream)
+                string location = UnityEngine.AssemblyExtension.GetLoadedAssemblyPath(assemblies[i]);
 
-                AddSearchDirectory(Path.GetDirectoryName(assemblies[i].Location));
+                if (string.IsNullOrEmpty(location))
+                {
+                    continue;
+                }
+
+                _appDomainAssemblyLocations[assemblies[i].FullName] = location;
+
+                AddSearchDirectory(Path.GetDirectoryName(location));
             }
         }
 
