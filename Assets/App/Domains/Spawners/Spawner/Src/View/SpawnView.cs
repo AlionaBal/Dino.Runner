@@ -18,7 +18,9 @@ namespace App.Spawner
         private Rigidbody _rigidbody;
         private IGameContext _gameContext;
 
-        void Start()
+        private static readonly Vector3 SpawnPosition = new Vector3(10, 0, 0);
+
+        void Awake()
         {
             _rigidbody = GetComponent<Rigidbody>();
             
@@ -44,7 +46,10 @@ namespace App.Spawner
             if (Camera.main != null) 
                 _leftEdge = Camera.main.ScreenToWorldPoint(Vector3.zero).x - 2f;
             
-            transform.position = new Vector3(10, 0, 0);
+            // Move the physics body too: transform changes are not synced to physics (autoSyncTransforms is off),
+            // so FixedUpdate would otherwise continue from the body's stale position.
+            transform.position = SpawnPosition;
+            _rigidbody.position = SpawnPosition;
         }
         
         void FixedUpdate()
