@@ -18,13 +18,15 @@ namespace App.Spawner
         private Rigidbody _rigidbody;
         private IGameContext _gameContext;
 
-        void Start()
+        private static readonly Vector3 SpawnPosition = new Vector3(10, 0, 0);
+
+        void Awake()
         {
             _rigidbody = GetComponent<Rigidbody>();
             
             _rigidbody.mass = 1f; // Adjust as necessary
-            _rigidbody.drag = 0.5f; // Adjust to simulate resistance
-            _rigidbody.angularDrag = 0.5f; // Prevent excessive spinning
+            _rigidbody.linearDamping = 0.5f; // Adjust to simulate resistance
+            _rigidbody.angularDamping = 0.5f; // Prevent excessive spinning
             _rigidbody.interpolation = RigidbodyInterpolation.Interpolate; // For smoother movement
             _rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic; // For fast-moving objects
 
@@ -44,7 +46,10 @@ namespace App.Spawner
             if (Camera.main != null) 
                 _leftEdge = Camera.main.ScreenToWorldPoint(Vector3.zero).x - 2f;
             
-            transform.position = new Vector3(10, 0, 0);
+            // Move the physics body too: transform changes are not synced to physics (autoSyncTransforms is off),
+            // so FixedUpdate would otherwise continue from the body's stale position.
+            transform.position = SpawnPosition;
+            _rigidbody.position = SpawnPosition;
         }
         
         void FixedUpdate()
@@ -62,6 +67,10 @@ namespace App.Spawner
         
         public void Dispose()
         {
+            // Already destroyed by Unity when the scene unloads before the pool is disposed
+            if (this == null)
+                return;
+
             Destroy(gameObject);
         }
     }
